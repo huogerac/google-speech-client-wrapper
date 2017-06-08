@@ -9,27 +9,7 @@ var http = require("http"),
 
 console.log('http://localhost:' + port);
 
-// Initialize Google Speech API
-// in order to make google api works
-// a key must be set
-// export GOOGLE_APPLICATION_CREDENTIALS=../path/mykeyfile.json
-
-const Speech = require('@google-cloud/speech');
-const speech = Speech({
-    projectId: 'arboreal-groove-169604'
-});
-// The encoding of the audio file, e.g. 'LINEAR16'
-const encoding = 'LINEAR16';
-const sampleRateHertz = 16000;
-const languageCode = 'en-US';
-const requestSpeech = {
-    config: {
-        encoding: encoding,
-        sampleRateHertz: sampleRateHertz,
-        languageCode: languageCode
-    },
-    interimResults: false // If you want interim results, set this to true
-    };
+var googleSpeechAPI = require("./src/googlespeechcontroller");
 
 // Stream the audio to the Google Cloud Speech API
 //const recognizeStream = speech.createRecognizeStream(requestSpeech)
@@ -174,20 +154,11 @@ function writeToDisk(dataURL, fileName, callback) {
             if (err) throw 'error writing file: ' + err;
             fs.close(fd, function() {
                 console.log('file written');
-                const requestS = {
-                  encoding: 'LINEAR16',
-                  sampleRateHertz: 44100,
-                  languageCode: 'en-US'
-                };
-                speech.recognize(filePath, requestS)
-                  .then((results) => {
-                    const transcription = results[0];
-                    console.log('Transcription: ', transcription);
-                    callback(transcription);
 
-                  }).catch((err) => {
-                    console.error('ERROR:', err);
-                });                
+                googleSpeechAPI.fileToText(filePath, function(transcription) {
+                  callback(transcription);
+                });
+
             });
         });
     });
@@ -225,34 +196,4 @@ function speechToText(dataURL, callback) {
 
 }
 
-
-/*
-function merge(socket, fileName) {
-    var FFmpeg = require('fluent-ffmpeg');
-
-    var audioFile = path.join(__dirname, 'uploads', fileName + '.wav'),
-        videoFile = path.join(__dirname, 'uploads', fileName + '.webm'),
-        mergedFile = path.join(__dirname, 'uploads', fileName + '-merged.webm');
-
-    new FFmpeg({
-            source: videoFile
-        })
-        .addInput(audioFile)
-        .on('error', function (err) {
-            socket.emit('ffmpeg-error', 'ffmpeg : An error occurred: ' + err.message);
-        })
-        .on('progress', function (progress) {
-            socket.emit('ffmpeg-output', Math.round(progress.percent));
-        })
-        .on('end', function () {
-            socket.emit('merged', fileName + '-merged.webm');
-            console.log('Merging finished !');
-
-            // removing audio/video files
-            fs.unlink(audioFile);
-            fs.unlink(videoFile);
-        })
-        .saveToFile(mergedFile);
-}
-*/
 
