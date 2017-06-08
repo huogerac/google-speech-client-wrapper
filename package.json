@@ -1,0 +1,29 @@
+{
+  "name": "google-speech-client-wrapper",
+  "version": "1.0.0",
+  "description": "Wrapper to call google speech api from the client side",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/huogerac/google-speech-client-wrapper.git"
+  },
+  "keywords": [
+    "speech",
+    "api"
+  ],
+  "author": "Roger Camargo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/huogerac/google-speech-client-wrapper/issues"
+  },
+  "homepage": "https://github.com/huogerac/google-speech-client-wrapper#readme",
+  "dependencies": {
+    "@google-cloud/speech": "^0.9.3",
+    "node-uuid": "^1.4.8",
+    "recordrtc": "^5.4.1",
+    "socket.io": "^1.0.6"
+  }
+}
