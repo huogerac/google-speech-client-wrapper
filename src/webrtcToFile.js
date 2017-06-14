@@ -75,40 +75,34 @@ WebRTCServer.startSockets = function() {
     //avoid to be initialize multiple times
     socket.on('message', function (data) {
       var fileName = uuid.v4();
-      console.log( 'typeof: ', typeof data.audio.dataURL );
-      that.writeToDisk(data.audio.dataURL, fileName + '.wav', function(text) {
-        console.log("--------------> [1] wav saved.");
-        socket.emit('merged', text);
+      var fileBuffer = Buffer.from(data.buffer);
+      // For some reason a 0x04 is prepended to the stream. 
+      // we remove it here to fix the file format
+      fileBuffer = fileBuffer.slice(1);
+      console.log("Sending %d bytes.", fileBuffer.length);
+      return googleSpeechAPI.bufferToText(fileBuffer).then(function(text){
+        socket.emit('transcript', text[0]);
       });
+      // NOTE: We don't really need to write anything to disk, but I leave this
+      // here just in case you want to review the audio.
 
+      // that.writeBufferToDisk(data.buffer, fileName + '.wav', function(text){
+      //   socket.emit('transcript', text);
+      // });
     });
   });
 
 };
 
-WebRTCServer.writeToDisk = function(dataURL, fileName, callback) {
-
-  var fileExtension = fileName.split('.').pop(),
-    fileRootNameWithBase = './uploads/' + fileName,
-    filePath = fileRootNameWithBase,
-    fileID = 2,
-    fileBuffer;
-
-  // @todo return the new filename to client
-  while (fs.existsSync(filePath)) {
-    filePath = fileRootNameWithBase + '(' + fileID + ').' + fileExtension;
-    fileID += 1;
-  }
-  console.log('---------------- 1:', typeof dataURL);
-
-  dataURL = dataURL.split(',').pop();
-  fileBuffer = new Buffer(dataURL, 'base64');
-
+WebRTCServer.writeBufferToDisk = function(dataBuffer, fileName, callback){
+  var filePath = './uploads/' + fileName;
+  
   fs.open(filePath, 'w', function(err, fd) {
     if (err) {
         throw 'error opening file: ' + err;
     }
-    fs.write(fd, fileBuffer, 0, fileBuffer.length, null, function(err) {
+    console.log("Writing buffer: ", dataBuffer);
+    fs.write(fd, dataBuffer, 0, dataBuffer.length, null, function(err) {
       if (err) throw 'error writing file: ' + err;
       fs.close(fd, function() {
         console.log('file written');
@@ -119,6 +113,7 @@ WebRTCServer.writeToDisk = function(dataURL, fileName, callback) {
     });
   });
 };
+
 
 
 WebRTCServer.startApi = function() {
