@@ -4,6 +4,9 @@
   }
 
   var socketio = io();
+  
+  socketio.binaryType = 'arraybuffer';
+
   var mediaStream = null;
   socketio.on('connect', function() {
       startRecording.disabled = false;
@@ -12,7 +15,7 @@
   var startRecording = document.getElementById('start-recording');
   var stopRecording = document.getElementById('stop-recording');
   var recordAudio, recordVideo;
-
+  
   startRecording.onclick = function() {
       startRecording.disabled = true;
       navigator.getUserMedia({
@@ -21,6 +24,9 @@
       }, function(stream) {
           mediaStream = stream;
           recordAudio = RecordRTC(stream, {
+              bufferSize: 4096,
+              sampleRate: 44100,
+
               type: 'audio',
               recorderType: StereoAudioRecorder,
               numberOfAudioChannels: 1,
@@ -28,7 +34,6 @@
                 console.log('started');
               }
           });
-          //var videoOnlyStream = new MediaStream();
           recordAudio.startRecording();
           stopRecording.disabled = false;
       }, function(error) {
@@ -41,36 +46,12 @@
       stopRecording.disabled = true;
       // stop audio recorder
       recordAudio.stopRecording(function() {
-        recordAudio.getDataURL(function(audioDataURL) {
-          var files = {
-            audio: {
-                type: recordAudio.getBlob().type || 'audio/wav',
-                dataURL: audioDataURL
-            }
-          };
-          socketio.emit('message', files);
-          if (mediaStream) mediaStream.stop();
-
-        });
-
-      });
-      // if firefox or if you want to record only audio
-      // stop audio recorder
-      recordAudio.stopRecording(function() {
-          // get audio data-URL
-          recordAudio.getDataURL(function(audioDataURL) {
-              var files = {
-                audio: {
-                  type: recordAudio.getBlob().type || 'audio/wav',
-                  dataURL: audioDataURL
-                }
-              };
-              socketio.emit('message', files);
-              if (mediaStream) mediaStream.stop();
-          });
+        var data = recordAudio.getBlob();
+        socketio.emit('message', data);
+        if (mediaStream) mediaStream.stop();
       });
   };
-  socketio.on('merged', function(text) {
+  socketio.on('transcript', function(text) {
     console.log('got data: ' + text);
     document.getElementById('txtText').innerHTML = document.getElementById('txtText').innerHTML + text;
   });

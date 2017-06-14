@@ -11,34 +11,38 @@
 
 const Speech = require('@google-cloud/speech');
 const speech = Speech({
-  projectId: 'arboreal-groove-169604'
+  projectId: 'replicator-speechrecognition'
 });
 
 const encoding = 'LINEAR16';
-const sampleRateHertz = 16000;
+const sampleRateHertz = 44100;
 const languageCode = 'en-US';
 
-const requestStreamSpeech = {
-  config: {
-    encoding: encoding,
-    sampleRateHertz: sampleRateHertz,
-    languageCode: languageCode
-  },
-  interimResults: false
-};
 
 const requestFileSpeech = {
-  encoding: 'LINEAR16',
-  sampleRateHertz: 44100,
-  languageCode: 'en-US'
+  encoding: encoding,
+  sampleRateHertz: sampleRateHertz,
+  languageCode: languageCode
 };
 
 var GoogleSpeechController = {};
 
 
+GoogleSpeechController.bufferToText = function(buffer){
+  return new Promise(function (resolve, reject) {
+      return speech.recognize({ content: buffer}, requestFileSpeech).then(function(res){
+        console.log("Results: ", res)
+        resolve(res);
+      }).catch(function(err){
+        console.log("API Error: ", err);
+        reject(err);
+      })
+  });
+};
+
 /** convert a file speech to a text */
 GoogleSpeechController.fileToText = function(filePath, callback) {
-
+  console.log("Sending to google: ", filePath);
   speech.recognize(filePath, requestFileSpeech)
     .then((results) => {
       const transcription = results[0];
