@@ -9,9 +9,10 @@
 // a key must be set
 // export GOOGLE_APPLICATION_CREDENTIALS=../path/mykeyfile.json
 
+// projectId: 'replicator-speechrecognition'
 const Speech = require('@google-cloud/speech');
 const speech = Speech({
-  projectId: 'replicator-speechrecognition'
+  projectId: 'arboreal-groove-169604'
 });
 
 const encoding = 'LINEAR16';
@@ -31,12 +32,12 @@ var GoogleSpeechController = {};
 GoogleSpeechController.bufferToText = function(buffer){
   return new Promise(function (resolve, reject) {
       return speech.recognize({ content: buffer}, requestFileSpeech).then(function(res){
-        console.log("Results: ", res)
+        console.log("Results: ", res);
         resolve(res);
       }).catch(function(err){
         console.log("API Error: ", err);
         reject(err);
-      })
+      });
   });
 };
 
