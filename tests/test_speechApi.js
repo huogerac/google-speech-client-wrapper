@@ -13,7 +13,7 @@ describe("SpeechToTextAPI", function() {
      **********/
     describe('Api', function() {
 
-      it('Should initialize the API', function(done) {
+      it('Should return an Object for the API initialize', function(done) {
 
         var SpeechToTextApi = require("../src/speeachToTextApi");
         var commands = ["hello"];
@@ -21,6 +21,26 @@ describe("SpeechToTextAPI", function() {
 
         assert.deepEqual( "object" , typeof speech );
         done();
+
+      });
+
+      it('Should match the result: "hello" (1 word)', function(done) {
+
+        var SpeechToTextApi = require("../src/speeachToTextApi");
+        var commands = ["hello"];
+        var speech = SpeechToTextApi.init(commands);
+
+        var match = '';
+        speech.addCallback('resultMatch', function(text) {
+          match = text;
+        }, this);
+
+        speech.process(["hello"]);
+
+        setTimeout(function () {
+          assert.deepEqual( "hello" , match );
+          done();
+        }, 500);
 
       });
 
