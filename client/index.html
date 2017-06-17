@@ -1,0 +1,78 @@
+<!--
+   The usage of WebRTC is based on
+   https://github.com/muaz-khan/RecordRTC/tree/master/RecordRTC-over-Socketio
+
+   However, it was:
+   Divided in layers
+   Separated into server (localhost:9001) and client (localhost:9002)
+   Created an "api" to access webrtc
+-->
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Speech to Text</title>
+    <script>
+    if (location.href.indexOf('file:') == 0) {
+        document.write('<h1 style="color:red;">Please load this HTML file on HTTP or HTTPS.</h1>');
+    }
+    </script>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+
+    <script src="/node_modules/recordrtc/RecordRTC.js">
+    </script>
+    <script src="/node_modules/socket.io-client/dist/socket.io.js">
+    </script>
+
+    <style>
+    html {
+        background-color: #f7f7f7;
+    }
+    
+    body {
+        background-color: white;
+        border: 1px solid rgb(15, 158, 238);
+        margin: 1% 35%;
+        text-align: center;
+    }
+    
+    hr {
+        border: 0;
+        border-top: 1px solid rgb(15, 158, 238);
+    }
+    
+    a {
+        color: #2844FA;
+        text-decoration: none;
+    }
+    
+    a:hover,
+    a:focus {
+        color: #1B29A4;
+    }
+    
+    a:active {
+        color: #000;
+    }
+    </style>
+</head>
+
+<body>
+    <h1>Speech to Text</h1>
+    <p>
+        <textarea id="txtText" rows="12"></textarea>
+    </p>
+
+    <div>
+        <button id="start-recording" disabled>Start</button>
+        <button id="stop-recording" disabled>Stop</button>
+    </div>
+
+    <script src="/src/webrtcclient.js"></script>
+    <script src="/index.js"></script>
+
+</body>
+
+</html>
